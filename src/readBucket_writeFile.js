@@ -16,7 +16,7 @@ const outputPath = join(__dirname, `../CO2Monitor/readings.json`)
 
 
 //set debug
-const debug = true;
+const debug = false;
 
 //Initialise Client
 // const {InfluxDB, Point} = require('@influxdata/influxdb-client') //require is an old way of importing
