@@ -7,15 +7,15 @@ fetch("./readings.json")
 
     document.getElementById("co2-value").innerHTML = data.co2._value;
     document.getElementById("co2-units").innerHTML = `ppm`;
-    document.getElementById("co2-lastupdated").innerHTML = data.co2.lastUpdatedTime;
+    document.getElementById("co2-lastupdated").innerHTML = data.co2.lastReadingTime;
 
     document.getElementById("humidity-value").innerHTML = data.humidity._value;
     document.getElementById("humidity-units").innerHTML = `%`;
-    document.getElementById("humidity-lastupdated").innerHTML = data.humidity.lastUpdatedTime;
+    document.getElementById("humidity-lastupdated").innerHTML = data.humidity.lastReadingTime;
 
     document.getElementById("temperature-value").innerHTML = data.temperature._value;
     document.getElementById("temperature-units").innerHTML = "\u2103";
-    document.getElementById("temperature-lastupdated").innerHTML = data.temperature.lastUpdatedTime;
+    document.getElementById("temperature-lastupdated").innerHTML = data.temperature.lastReadingTime;
     
   })
   .catch((error) => console.error("Error loading JSON:", error));
