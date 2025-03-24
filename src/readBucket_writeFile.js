@@ -2,7 +2,7 @@
 
 ////TODO
 //Is there a cleaner way to write the async promises etc. Maybe write the functions seperately rather than a thousand nested callbacks
-//dont use token like this. Make it an env variable or at least put it in secrets so it isn't commit
+//DONE - dont use token like this. Make it an env variable or at least put it in secrets so it isn't commit
 
 import {writeFile} from 'node:fs'
 import { dirname, join } from 'path';
@@ -35,6 +35,8 @@ const bucket = `aBucket`
 const minutesInPast = 10;
 const queryClient = client.getQueryApi(org)
 const fields = [`co2`, `temperature`, `humidity`]
+//extraordinarily rough manual calibration for temp sensor. Could do this with something binary on the actual sensor. Don't want to currently.
+const temperature_offset = -10.3
 
   
   
@@ -101,6 +103,7 @@ const promises = fields.map((field) => {
 //I don't know fully yet but: when promises all promises are resolved, go to .then() and write to file.
 Promise.all(promises)
   .then(() => {
+    objectToWriteOut["temperature"]["_value"] += temperature_offset
     const stringToWriteOut = JSON.stringify(objectToWriteOut, null, 4);
     if (debug) {
     console.log(`DEBUG stringToWriteOut ${stringToWriteOut}`)
