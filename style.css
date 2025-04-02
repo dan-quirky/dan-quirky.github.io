@@ -1,0 +1,49 @@
+:root {
+  --main-bg-color: #fce6bd;
+  /* --main-text-color: #096332; */
+  --main-text-color: #004225;
+  --secondary-text-color: #3d0000;
+  --parent-margins:  0.5em 8em;
+  --parent-font-size: 1.8em;
+}
+html {
+  font-family: Helvetica, sans-serif;
+  font-size: var(--parent-font-size );
+  background-color: var(--main-bg-color);
+  color: var(--main-text-color);
+  text-align: center;
+  margin: var(--parent-margins);
+}
+body {
+
+}
+p {
+  text-align: justify;
+}
+
+/* Headings */
+.fancy-title {
+  background-color: var(--main-text-color);
+  color: var(--main-bg-color);
+  letter-spacing: 1em;
+  text-transform: uppercase;
+  font-family: 'Times New Roman', Times, serif;
+  margin: 0;
+  /* padding: 1em; */
+  background-clip: padding-box;
+  /* reset margin */
+  margin: calc(var(--parent-font-size)*-0.25) 0em 1em 0em;
+  /* padding: 0.5em 0em; */
+  /* set width to 100% of viewport */
+  width: 100vw;
+  height: calc(var(--parent-font-size) * 1.25);
+  line-height: calc(var(--parent-font-size) * 1.25);
+  /* Allows position properties i.e. left */
+  position: relative;
+  /* Set left edge to 50% of container (i.e. the middle) */
+  left: 50%; 
+  /* shift whole box 50% left */
+  transform: translateX(-50%); 
+  
+
+}
