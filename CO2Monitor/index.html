@@ -3,46 +3,51 @@
   <head>  <!--webbsite metatdata-->
     <meta charset="UTF-8">
     <title>CO2 Monitor</title>  <!--displayed website title-->
-    <link rel="stylesheet" href="../style.css"> <!--adds stylesheet namespace, using the file at the href location -->
+    <link rel="stylesheet" href="../style.css"> 
+    <!-- adds stylesheet namespace, using the file at the href location -->
     <link rel="icon" href="./favicon.ico" type="image/x-icon"> <!--small image near name-->
     <script src="https://bernii.github.io/gauge.js/dist/gauge.min.js"></script>
     <script type="module" src="extractReadings.js"></script>
     <meta name="viewport" content="width=device-width, initial-scale=1">
   </head>
   <body>
-    <h1>CO<sub>2</sub></h1>
-    <canvas id="co2-gauge"></canvas>
-    <p style="text-align: center;">
-      <span class = co2-value></span> ppm
-    </p>
+    <div style="text-align: center;">
+      <div style = "display: inline-block;">
+        <h1>CO<sub>2</sub></h1>
+        <canvas id="co2-gauge"></canvas>
+        <p>
+          <span class = co2-value></span> <span class = co2-units></span> 
+        </p>
+      </div>
+      <div style = "display: inline-block;">
+        <h1>Humidity<sub></sub></h1>
+        <canvas id="humidity-gauge"></canvas>
+        <p>
+          <span class = humidity-value></span> <span class = humidity-units></span> 
+        </p>
+      </div>
+      <div style = "display: inline-block;">
+        <h1>Temperature<sub></sub></h1>
+        <canvas id="temperature-gauge"></canvas>
+        <p>
+          <span class = temperature-value></span><span class = temperature-units></span>
+        </p>
+      </div>
+    </div>
     <br/><br/>
-    <p>Last CO2 reading was 
-      <span class = co2-value></span> 
-      <span id = co2-units></span> 
-      at 
-      <span id = co2-lastupdated></span>
-    </p>
-    <p>Last humidity reading was 
-      <span id = humidity-value></span> 
-      <span id = humidity-units></span> 
-      at 
-      <span id = humidity-lastupdated></span>
-    </p>
-    <p>Last temperature reading was 
-      <span id = temperature-value></span> 
-      <span id = temperature-units></span> 
-      at 
-      <span id = temperature-lastupdated></span>
-    </p>    
+    <footer>
+    <p class="footer">Last CO2 reading was <span class="co2-value"></span> <span class="co2-units"></span> at <span class="co2-lastupdated"></span></p>
+    <p class="footer">Last humidity reading was <span class="humidity-value"></span> <span class="humidity-units"></span> at <span class="humidity-lastupdated"></span></p>
+    <p class="footer">Last temperature reading was <span class="temperature-value"></span> <span class="temperature-units"></span> at <span class="temperature-lastupdated"></span></p>
+  </footer>
 
 
   
-    <script type="module">
+  <script type="module">
   import { readingsDataPromise } from "./extractReadings.js";
-
-  var opts = {
+  const default_opts = {
     lines: 12,
-    angle: 0.15,
+    angle: -0.18,
     lineWidth: 0.44,
     pointer: {
       length: 0.9,
@@ -50,32 +55,57 @@
       color: '#000000'
     },
     limitMax: 'false', 
-    percentColors: [[0.0, "#a9d70b" ], [0.50, "#f9c802"], [1.0, "#ff0000"]], // !!!!
     strokeColor: '#E0E0E0',
     generateGradient: true
   };
-  var target = document.getElementById('co2-gauge');
-  var gauge = new Gauge(target).setOptions(opts);
-  gauge.maxValue = 2000;
-  gauge.animationSpeed = 32;
-  readingsDataPromise.then(data => gauge.set(data.co2._value));
+  const co2_opts = { ...default_opts, 
+    percentColors: [[0.0, "#22f245" ], [0.75, "#f9c802"], [1.0, "#ff0000"]], // !!!!
+  };
+  const humidity_opts = { ...default_opts,
+    percentColors: [[0.0, "#99c0e3" ], [1.0, "#0076e0"]], // !!!!
+   };
+  const temperature_opts = { ...default_opts,
+    percentColors: [[0.0, "#22b0f2" ], [0.5, "#ebb41c"], [1.0, "#e61e1e"]], // !!!!
+   };
+  const gauges = [
+    {id: "co2-gauge", options: co2_opts, minValue: 0, maxValue: 2000, valuekey:`co2`},
+    {id: "humidity-gauge", options: humidity_opts, minValue: 30, maxValue: 70, valuekey:`humidity`},
+    {id: "temperature-gauge", options: temperature_opts, minValue: 15, maxValue: 30, valuekey:`temperature`}
+  ]
+  for(let g of gauges){
+    const target = document.getElementById(g.id);
+    const gauge = new Gauge(target).setOptions(g.options);
+    gauge.maxValue = g.maxValue;
+    gauge.minValue = g.minValue;
+    gauge.animationSpeed = 32;
+    gauge.set(0)
+    readingsDataPromise.then(data => gauge.set(data[g.valuekey]._value));
+  }
 </script>
 <script type="module">
 import { readingsDataPromise } from "./extractReadings.js";
 readingsDataPromise
   .then(data => {
     console.log(data) //debug
-    document.querySelectorAll(".co2-value").forEach(element => {
-      element.innerHTML = Math.round(data.co2._value);
-    });
-    document.getElementById("co2-units").innerHTML = `ppm`;
-    document.getElementById("co2-lastupdated").innerHTML = data.co2.lastReadingTime;
-    document.getElementById("humidity-value").innerHTML = data.humidity._value;
-    document.getElementById("humidity-units").innerHTML = `%`;
-    document.getElementById("humidity-lastupdated").innerHTML = data.humidity.lastReadingTime;
-    document.getElementById("temperature-value").innerHTML = data.temperature._value;
-    document.getElementById("temperature-units").innerHTML = "\u2103";
-    document.getElementById("temperature-lastupdated").innerHTML = data.temperature.lastReadingTime;
+    const elementValues = [
+      [".co2-value",Math.round(data.co2._value)], [".co2-units",`ppm`],[".co2-lastupdated",data.co2.lastReadingTime],
+      [".humidity-value",Math.round(data.humidity._value)], [".humidity-units",`%`],[".humidity-lastupdated",data.humidity.lastReadingTime],
+      [".temperature-value",Math.round(data.temperature._value)], [".temperature-units","\u00B0"+"C"],[".temperature-lastupdated",data.temperature.lastReadingTime],
+    ];
+    console.log(elementValues);
+    for (let i in elementValues){
+      const element = elementValues[i][0];
+      const value = elementValues[i][1];
+      console.log(element);
+      console.log(value);
+      console.log(document.querySelectorAll(element))
+      document.querySelectorAll(element).forEach(el => {el.innerHTML = value});      
+    }
+
+    //alt way of assigning pulling js vals into html, but limited to one per page as ids must be unique
+    // document.getElementById("humidity-value").innerHTML = data.humidity._value;
+    // document.getElementById("humidity-units").innerHTML = `%`;
+    // document.getElementById("humidity-lastupdated").innerHTML = data.humidity.lastReadingTime;
   });
 </script>
       

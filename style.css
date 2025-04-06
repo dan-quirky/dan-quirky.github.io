@@ -12,17 +12,23 @@ html {
   background-color: var(--main-bg-color);
   color: var(--main-text-color);
   text-align: center;
-  margin: var(--parent-margins);
+  /* margin: var(--parent-margins); */
 }
 body {
 
 }
-p {
+p{
+  text-align: justify;
+  margin: var(--parent-margins);
+}
+p.footer{
+  margin: 0;
   text-align: justify;
 }
 
 /* Headings */
 .fancy-title {
+  /* this is probably overcomplicated */
   background-color: var(--main-text-color);
   color: var(--main-bg-color);
   letter-spacing: 1em;
