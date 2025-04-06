@@ -9,24 +9,15 @@ import { dirname, join } from 'path';
 import { fileURLToPath } from 'url';
 import {InfluxDB_Api_Token} from './secrets.js'
 
-
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 const outputPath = join(__dirname, `../CO2Monitor/readings.json`)
-
 
 //set debug
 const debug = false;
 
 //Initialise Client
-// const {InfluxDB, Point} = require('@influxdata/influxdb-client') //require is an old way of importing
 import {InfluxDB, Point} from '@influxdata/influxdb-client';
-
-/*Warning: 
-Quick and dirty token, 
-better thing to do is edit .profile to set an env variable and call token with
-const token = process.env.INFLUXDB_TOKEN
-*/ 
 const token = InfluxDB_Api_Token;
 const url = 'http://192.168.1.210:8086' //influx url
 const client = new InfluxDB({url, token})
@@ -38,16 +29,7 @@ const fields = [`co2`, `temperature`, `humidity`]
 //extraordinarily rough manual calibration for temp sensor. Could do this with something binary on the actual sensor. Don't want to currently.
 const temperature_offset = -4.6
 
-  
-  
-//Return values field averaged over last minutesInPast 
-//todo 
-// nest relevant values of each query into an object to write out
-// Add error handling to retry read n times before giving up
 let objectToWriteOut = {};
-
-
-
 
 //initialise a promise for each field in field
 const promises = fields.map((field) => {
@@ -69,20 +51,21 @@ const promises = fields.map((field) => {
         }
         //format and delete properties of the returned query object
         for (let key in tableObject){
-        let keysToKeep = [`_stop`, `_value`]
-        if (keysToKeep.includes(key)){
-          switch (key) {
-            case `_stop`:
-              tableObject[`lastReadingTime`] = tableObject[key];
-              delete tableObject[key];
-              break;
+          let keysToKeep = [`_stop`, `_value`]
+          if (keysToKeep.includes(key)){
+            switch (key) {
+              case `_stop`:
+                tableObject[`lastReadingTime`] = tableObject[key];
+                delete tableObject[key];
+                break;
+            }
           }
-        }
-        else {
-          delete tableObject[key];
-        } 
+          else {
+            delete tableObject[key];
+          } 
         // Add the cleaned query object to the writeout
-        objectToWriteOut = Object.assign( objectToWriteOut, {[`${field}`] : {...tableObject} }) //... is spread operator, unpacks properties of tableObject and assigns to the field directly. (otherwise would have a nested tableObject property too)
+        objectToWriteOut = Object.assign( objectToWriteOut, {[`${field}`] : {...tableObject} }) 
+        //... is spread operator, unpacks properties of tableObject and assigns to the field directly. (otherwise would have a nested tableObject property too)
         if (debug) {console.log(`DEBUG ${JSON.stringify(objectToWriteOut, null, 4)}`)}
         }
       },
@@ -106,17 +89,17 @@ Promise.all(promises)
     objectToWriteOut["temperature"]["_value"] += temperature_offset
     const stringToWriteOut = JSON.stringify(objectToWriteOut, null, 4);
     if (debug) {
-    console.log(`DEBUG stringToWriteOut ${stringToWriteOut}`)
-    console.log(`DEBUG ${__dirname}`)
-    console.log(`DEBUG ${outputPath}`)
+      console.log(`DEBUG stringToWriteOut ${stringToWriteOut}`)
+      console.log(`DEBUG ${__dirname}`)
+      console.log(`DEBUG ${outputPath}`)
     }
     writeFile(outputPath, stringToWriteOut, (err) => {
-        if (err) throw err;
+      if (err) throw err;
         console.log('The file has been saved!');
     });
   })
   .catch((error) => {
-    console.error('An error occurred:', error)
+    console.error('\nError', error)
   })
 
 
