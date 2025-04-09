@@ -11,39 +11,74 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
   </head>
   <body>
-    <div style="text-align: center;">
-      <div style = "display: inline-block;">
+    <h1 class="fancy-title-linebreaking">C<span style="letter-spacing: 0.25em;" >o<sub>2</sub></span> monitor</h1>
+    <div class = "gauges">
+      <div class = "gauge">
         <h1>CO<sub>2</sub></h1>
         <canvas id="co2-gauge"></canvas>
         <p>
           <span class = co2-value></span> <span class = co2-units></span> 
         </p>
       </div>
-      <div style = "display: inline-block;">
+      <div class = "gauge">
         <h1>Humidity<sub></sub></h1>
         <canvas id="humidity-gauge"></canvas>
         <p>
           <span class = humidity-value></span> <span class = humidity-units></span> 
         </p>
       </div>
-      <div style = "display: inline-block;">
+      <div class = "gauge">
         <h1>Temperature<sub></sub></h1>
         <canvas id="temperature-gauge"></canvas>
         <p>
           <span class = temperature-value></span><span class = temperature-units></span>
         </p>
       </div>
+      <br>
+      <span style="font-size: 0.75em;"></span>Last reading was <span class="minutes-since-updated"></span> minutes ago</span>
+      <br>
+      <span style="font-size: 0.75em;">Outside air is approximately 400ppm. CO<sub>2</sub> concentrations above 1000ppm can cause <a href="https://www.co2meter.com/en-uk/blogs/news/carbon-dioxide-indoor-levels-chart?srsltid=AfmBOop_2-I9E_A-MeJA4d32U7DR1cezLH28fnS7PKvLMyd6BalQk7W0">drowsiness</a>.</span>
     </div>
-    <br/><br/>
-    <footer>
-    <p class="footer">Last CO2 reading was <span class="co2-value"></span> <span class="co2-units"></span> at <span class="co2-lastupdated"></span></p>
-    <p class="footer">Last humidity reading was <span class="humidity-value"></span> <span class="humidity-units"></span> at <span class="humidity-lastupdated"></span></p>
-    <p class="footer">Last temperature reading was <span class="temperature-value"></span> <span class="temperature-units"></span> at <span class="temperature-lastupdated"></span></p>
-  </footer>
+    <br/><br/> 
+    <div style="margin: 0 6em 0; text-align: justify;">
+      <h2>How does this work?</h2>
+      <ul style="line-height: 125%; margin-top: 0;">
+        <li>Regular readings are taken from my flat with an <a href="https://sensirion.com/products/catalog/SCD40">SDC40</a> CO2 Monitor mounted on an <a href="https://www.wemos.cc/en/latest/d1/d1_mini.html">ESP32</a> microcontroller.</li>
+        <li>Data is ingested by InfluxDB, a time series database running on a linux server (aka an old PC in the corner of my room).</li>
+        <li><a href="../src/readBucket_writeFile.js">This node.js script</a> is run server-side to query InfluxDB and write data to <a href="readings.json">a json file</a>.</li>
+        <ul>
+          <li>Promises are used to ensure all aynchronous queries are resolved before the file is written out.</li>
+        </ul>
+        <li>A scheduled <a href="../src/readBucket_writeFile.js">shell script</a> runs this script, commits and pushes the updated readings file to the GitHub Pages repository for this site  </li>
+        <ul>
+          <li>This would not be needed if the server was exposed to the internet. <i>I do not want to expose the server to the internet.</i></li>
+        </ul>
+        <li>The <a href="./extractReadings.js">Fetch API</a> is used in a client-side script to access the readings file and export a promise which resolves to a javascript object containing the readings data. Scripts in the html body import this to...
+          <ul>
+            <li>Set the gauge values.</li>
+            <li>Assign values to html elements.</li>
+          </ul>
+
+      <br>
+      Credit:
+      <ul>
+        <li>Hosted on GitHub Pages</li>
+        <li>Gauges are made using <a href="https://github.com/bernii/gauge.js">gauge.js</a></li>
+        <li>Microcontroller code can be found in <a href="https://github.com/alifeee/co2-monitoring">this repo</a>.</li>
+        <li>Anything else is my fault.</li>
+      </ul>
+      </ul>
+    </div>
+    <details>
+    <summary>Raw Data</summary>
+      <p>Last CO2 reading was <span class="co2-value"></span> <span class="co2-units"></span> at <span class="co2-lastupdated"></span></p>
+      <p>Last humidity reading was <span class="humidity-value"></span> <span class="humidity-units"></span> at <span class="humidity-lastupdated"></span></p>
+      <p>Last temperature reading was <span class="temperature-value"></span> <span class="temperature-units"></span> at <span class="temperature-lastupdated"></span></p>
+    </details>
 
 
-  
   <script type="module">
+  //Configure Gauge options, set values from readings.json.
   import { readingsDataPromise } from "./extractReadings.js";
   const default_opts = {
     lines: 12,
@@ -55,7 +90,7 @@
       color: '#000000'
     },
     limitMax: 'false', 
-    strokeColor: '#E0E0E0',
+    strokeColor: '#fff',
     generateGradient: true
   };
   const co2_opts = { ...default_opts, 
@@ -83,26 +118,26 @@
   }
 </script>
 <script type="module">
+//Assign values from readings.json to html elements
 import { readingsDataPromise } from "./extractReadings.js";
 readingsDataPromise
   .then(data => {
     console.log(data) //debug
+    const minutesSinceUpdate = Math.round((Date.now() - Date.parse(data.co2.lastReadingTime))/1000/60)
     const elementValues = [
       [".co2-value",Math.round(data.co2._value)], [".co2-units",`ppm`],[".co2-lastupdated",data.co2.lastReadingTime],
       [".humidity-value",Math.round(data.humidity._value)], [".humidity-units",`%`],[".humidity-lastupdated",data.humidity.lastReadingTime],
       [".temperature-value",Math.round(data.temperature._value)], [".temperature-units","\u00B0"+"C"],[".temperature-lastupdated",data.temperature.lastReadingTime],
+      [".minutes-since-updated",minutesSinceUpdate],
     ];
     console.log(elementValues);
     for (let i in elementValues){
       const element = elementValues[i][0];
       const value = elementValues[i][1];
-      console.log(element);
-      console.log(value);
-      console.log(document.querySelectorAll(element))
       document.querySelectorAll(element).forEach(el => {el.innerHTML = value});      
     }
 
-    //alt way of assigning pulling js vals into html, but limited to one per page as ids must be unique
+    //alt way of assigning pulling js vals into html, but limited to one per page b/c ids are be unique
     // document.getElementById("humidity-value").innerHTML = data.humidity._value;
     // document.getElementById("humidity-units").innerHTML = `%`;
     // document.getElementById("humidity-lastupdated").innerHTML = data.humidity.lastReadingTime;

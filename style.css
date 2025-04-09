@@ -3,32 +3,42 @@
   /* --main-text-color: #096332; */
   --main-text-color: #004225;
   --secondary-text-color: #3d0000;
-  --parent-margins:  0.5em 8em;
-  --parent-font-size: 1.8em;
+  /* --parent-margins:  0.5em 8em; */
+  --parent-margin: 2em;
+  --parent-font-size: 1.4em;
 }
-html {
+html, body {
+  margin: 0;
+  padding: 0;
+}
+body{
+  overflow-x: hidden;
   font-family: Helvetica, sans-serif;
   font-size: var(--parent-font-size );
   background-color: var(--main-bg-color);
   color: var(--main-text-color);
   text-align: center;
+  /* margin: 0 auto 0; */
+}
+
+p.main{
+  text-align: justify;
   /* margin: var(--parent-margins); */
 }
-body {
-
-}
-p{
+details {
   text-align: justify;
-  margin: var(--parent-margins);
+  margin: var(--parent-margin);
 }
-p.footer{
+details p{
+  /* margin: var(--parent-margins); */
   margin: 0;
   text-align: justify;
 }
 
 /* Headings */
-.fancy-title {
+h1.fancy-title {
   /* this is probably overcomplicated */
+  font-size: calc(var(--parent-font-size) * 1.5);
   background-color: var(--main-text-color);
   color: var(--main-bg-color);
   letter-spacing: 1em;
@@ -50,6 +60,42 @@ p.footer{
   left: 50%; 
   /* shift whole box 50% left */
   transform: translateX(-50%); 
-  
+}
 
+h1.fancy-title-linebreaking {
+  font-size: calc(var(--parent-font-size) * 1.5);
+  box-sizing: border-box;  background-color: var(--main-text-color);
+  color: var(--main-bg-color);
+  letter-spacing: 1em;
+  overflow-wrap: anywhere; /*Word breaks as last resort*/
+  /* TODO: Scale text dynamically instead of word breaking */
+  text-transform: uppercase;
+  font-family: 'Times New Roman', Times, serif;
+  margin: 0; 
+  background-clip: padding-box;
+  padding: 0.2em 0 0.3em;
+  width: 102vw
+}
+  h2 {
+    font-family: 'Courier New', Courier, monospace;
+    font-size: calc(var(--parent-font-size) * 1.25);
+    text-decoration: underline;
+    text-align: justify;
+    margin: 0;
+    padding: 0;
+  }
+/* Gauges */
+.gauges{
+  font-family: 'Courier New', Courier, monospace;
+  text-align: center;
+}
+.gauge{
+  display: inline-block;
+  margin:0;
+  padding: 0;
+}
+.gauge h1{
+  font-weight: lighter;
+  font-size: calc(var(--parent-font-size) * 1.25);
+  padding: 0;
 }

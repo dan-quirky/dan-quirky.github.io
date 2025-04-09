@@ -83,7 +83,7 @@ const promises = fields.map((field) => {
   })
 });
 
-//I don't know fully yet but: when promises all promises are resolved, go to .then() and write to file.
+//when promises all promises are resolved, go to .then() and write to file.
 Promise.all(promises)
   .then(() => {
     objectToWriteOut["temperature"]["_value"] += temperature_offset
