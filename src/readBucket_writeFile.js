@@ -27,7 +27,7 @@ const minutesInPast = 10;
 const queryClient = client.getQueryApi(org)
 const fields = [`co2`, `temperature`, `humidity`]
 //extraordinarily rough manual calibration for temp sensor. Could do this with something binary on the actual sensor. Don't want to currently.
-const temperature_offset = -4.6
+const temperature_offset = -10.3
 
 let objectToWriteOut = {};
 
