@@ -7,7 +7,7 @@
 import {writeFile} from 'node:fs'
 import { dirname, join } from 'path';
 import { fileURLToPath } from 'url';
-import {InfluxDB_Api_Token} from './secrets.js'
+import {InfluxDB_Api_Token, InfluxDB_Url} from './secrets.js'
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -19,7 +19,7 @@ const debug = false;
 //Initialise Client
 import {InfluxDB, Point} from '@influxdata/influxdb-client';
 const token = InfluxDB_Api_Token;
-const url = 'http://192.168.1.210:8086' //influx url
+const url = InfluxDB_Url //influx url
 const client = new InfluxDB({url, token})
 const org = `anOrganisation`
 const bucket = `aBucket`
