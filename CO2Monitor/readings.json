@@ -1,14 +1,14 @@
 {
-    "temperature": {
-        "_value": 20.9235,
-        "lastReadingTime": "2026-05-31T15:20:02.246222959Z"
-    },
     "humidity": {
-        "_value": 54.527,
-        "lastReadingTime": "2026-05-31T15:20:02.246347975Z"
+        "_value": 54.50300000000001,
+        "lastReadingTime": "2026-05-31T15:30:01.90718539Z"
     },
     "co2": {
-        "_value": 572.25,
-        "lastReadingTime": "2026-05-31T15:20:02.245935348Z"
+        "_value": 562.15,
+        "lastReadingTime": "2026-05-31T15:30:01.906830287Z"
+    },
+    "temperature": {
+        "_value": 20.948999999999998,
+        "lastReadingTime": "2026-05-31T15:30:01.907158428Z"
     }
 }
